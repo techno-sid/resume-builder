@@ -1,0 +1,114 @@
+.template-one {
+  font-family: 'Inter', sans-serif;
+  padding: 40px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.t1-header {
+  border-bottom: 2px solid var(--primary-blue);
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.t1-header h1 {
+  font-size: 2.5rem;
+  color: var(--primary-blue);
+  margin-bottom: 5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.t1-header h2 {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 15px;
+  font-weight: 400;
+}
+
+.t1-contact-info {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.t1-contact-info span {
+  display: flex;
+  align-items: center;
+}
+
+.t1-contact-info span:not(:last-child)::after {
+  content: "•";
+  margin-left: 15px;
+  color: var(--accent-blue);
+}
+
+.t1-section {
+  margin-bottom: 30px;
+}
+
+.t1-section h3 {
+  font-size: 1.3rem;
+  color: var(--primary-blue);
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.t1-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.t1-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 5px;
+}
+
+.t1-item-header h4 {
+  font-size: 1.1rem;
+  color: #222;
+  margin: 0;
+}
+
+.t1-company, .t1-school {
+  font-weight: 400;
+  color: #555;
+  font-style: italic;
+}
+
+.t1-date {
+  font-size: 0.9rem;
+  color: var(--primary-blue);
+  font-weight: 500;
+}
+
+.t1-item p {
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.t1-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.t1-skill-badge {
+  background-color: var(--secondary-blue);
+  color: var(--primary-blue);
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}

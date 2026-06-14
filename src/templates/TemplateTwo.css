@@ -1,0 +1,118 @@
+.template-two {
+  display: flex;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+  line-height: 1.5;
+  height: 100%;
+}
+
+.t2-sidebar {
+  width: 35%;
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 40px 30px;
+}
+
+.t2-name {
+  font-size: 2.2rem;
+  margin-bottom: 5px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: white;
+}
+
+.t2-title {
+  font-size: 1.1rem;
+  color: var(--secondary-blue);
+  margin-bottom: 30px;
+  font-weight: 400;
+}
+
+.t2-sidebar h3 {
+  color: white;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+  margin-top: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.t2-contact-item {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.t2-skills ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.t2-skills li {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.t2-main {
+  width: 65%;
+  padding: 40px;
+  background-color: white;
+}
+
+.t2-section {
+  margin-bottom: 30px;
+}
+
+.t2-section h3 {
+  font-size: 1.4rem;
+  color: var(--primary-blue);
+  border-bottom: 2px solid var(--secondary-blue);
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.t2-section p {
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.t2-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.t2-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 5px;
+}
+
+.t2-item-title h4 {
+  font-size: 1.1rem;
+  color: #222;
+  margin: 0 0 2px 0;
+}
+
+.t2-company, .t2-school {
+  font-weight: 500;
+  color: var(--primary-blue);
+  font-size: 0.95rem;
+}
+
+.t2-date {
+  font-size: 0.85rem;
+  color: #777;
+  white-space: nowrap;
+}
+
+.t2-item p {
+  margin-top: 5px;
+}
