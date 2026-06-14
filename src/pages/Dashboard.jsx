@@ -1,32 +1,43 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
-import { Plus, FileText, Trash2, LogOut } from 'lucide-react'
-import AuthModal from '../components/AuthModal'
+import { Plus, FileText, Trash2 } from 'lucide-react'
 
-export default function Dashboard({ user }) {
-  const navigate = useNavigate();
+export default function Dashboard() {
   const [resumes, setResumes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(!user);
 
   useEffect(() => {
-    if (user) {
-      setIsAuthModalOpen(false);
-      fetchResumes();
-    }
-  }, [user]);
+    fetchResumes();
+  }, []);
 
   const fetchResumes = async () => {
     setIsLoading(true);
     try {
+      // Get saved resume IDs from localStorage
+      const savedIds = JSON.parse(localStorage.getItem('my_resumes') || '[]');
+      
+      if (savedIds.length === 0) {
+        setResumes([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Fetch only the resumes that belong to this browser
       const { data, error } = await supabase
         .from('resumes')
         .select('id, title, updated_at')
-        .eq('user_id', user.id)
+        .in('id', savedIds)
         .order('updated_at', { ascending: false });
         
       if (error) throw error;
+      
+      // Clean up localStorage if some resumes were deleted from the server
+      if (data && data.length !== savedIds.length) {
+        const validIds = data.map(r => r.id);
+        localStorage.setItem('my_resumes', JSON.stringify(validIds));
+      }
+      
       setResumes(data || []);
     } catch (error) {
       console.error('Error fetching resumes:', error.message);
@@ -40,17 +51,18 @@ export default function Dashboard({ user }) {
     if (!window.confirm("Are you sure you want to delete this resume?")) return;
     
     try {
-      const { error } = await supabase.from('resumes').delete().eq('id', id);
-      if (error) throw error;
+      // Optimistic UI update
       setResumes(resumes.filter(r => r.id !== id));
+      
+      // Update localStorage
+      const savedIds = JSON.parse(localStorage.getItem('my_resumes') || '[]');
+      localStorage.setItem('my_resumes', JSON.stringify(savedIds.filter(savedId => savedId !== id)));
+
+      // Delete from server
+      await supabase.from('resumes').delete().eq('id', id);
     } catch (error) {
       console.error('Error deleting:', error.message);
-      alert("Could not delete resume.");
     }
-  };
-
-  const handleAuthSuccess = () => {
-    setIsAuthModalOpen(false);
   };
 
   return (
@@ -58,29 +70,10 @@ export default function Dashboard({ user }) {
       <header className="app-header">
         <div className="header-content">
           <h1>My Resumes</h1>
-          <div className="header-actions">
-            {!user ? (
-              <button className="download-btn" onClick={() => setIsAuthModalOpen(true)}>
-                Log In
-              </button>
-            ) : (
-              <button className="download-btn" style={{backgroundColor: '#dc3545'}} onClick={() => supabase.auth.signOut()}>
-                <LogOut size={18} />
-                Sign Out
-              </button>
-            )}
-          </div>
         </div>
       </header>
       
       <main className="dashboard-main" style={{maxWidth: '1000px', margin: '2rem auto', width: '100%', padding: '0 2rem'}}>
-        
-        {!user && (
-          <div style={{backgroundColor: '#fff3cd', color: '#856404', padding: '1rem', borderRadius: '6px', marginBottom: '2rem', border: '1px solid #ffeeba'}}>
-            <strong>Guest Mode:</strong> You can create a new resume, but you must log in to save and manage multiple resumes.
-          </div>
-        )}
-
         <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '2rem'}}>
           
           <Link to="/builder/new" style={{textDecoration: 'none'}}>
@@ -137,12 +130,6 @@ export default function Dashboard({ user }) {
           ))}
         </div>
       </main>
-
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        onAuthSuccess={handleAuthSuccess} 
-      />
     </div>
   )
 }

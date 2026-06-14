@@ -5,19 +5,17 @@ import html2pdf from 'html2pdf.js'
 
 import { supabase } from '../lib/supabaseClient'
 import { defaultResumeData } from '../lib/defaultData'
-import AuthModal from '../components/AuthModal'
 import ResumeForm from '../components/ResumeForm'
 import ResumePreview from '../components/ResumePreview'
 import TemplateSelector from '../components/TemplateSelector'
 
-export default function Builder({ user }) {
+export default function Builder() {
   const { id } = useParams()
   const navigate = useNavigate()
   
   const [resumeData, setResumeData] = useState(defaultResumeData);
   const [selectedTemplate, setSelectedTemplate] = useState('template1');
   const [title, setTitle] = useState('My Resume');
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(id && id !== 'new');
 
@@ -25,7 +23,7 @@ export default function Builder({ user }) {
     if (id && id !== 'new') {
       loadResume(id);
     }
-  }, [id, user]);
+  }, [id]);
 
   const loadResume = async (resumeId) => {
     setIsLoading(true);
@@ -43,25 +41,18 @@ export default function Builder({ user }) {
       }
     } catch (error) {
       console.error("Error loading resume:", error.message);
-      // If it fails to load (e.g. they don't own it or it's deleted), redirect to dashboard
-      if (user) navigate('/');
+      navigate('/');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSave = async (currentUser) => {
-    if (!currentUser) {
-      setIsAuthModalOpen(true);
-      return;
-    }
-
+  const handleSave = async () => {
     setIsSaving(true);
     try {
       let currentId = id === 'new' ? undefined : id;
       
       const payload = {
-        user_id: currentUser.id,
         title: title,
         resume_data: resumeData,
         updated_at: new Date().toISOString()
@@ -84,20 +75,21 @@ export default function Builder({ user }) {
           .single();
           
         if (error) throw error;
+        
+        // Save ID to local storage so Dashboard knows we own it
+        const savedIds = JSON.parse(localStorage.getItem('my_resumes') || '[]');
+        savedIds.push(data.id);
+        localStorage.setItem('my_resumes', JSON.stringify(savedIds));
+
         alert("New resume saved successfully!");
         navigate(`/builder/${data.id}`, { replace: true });
       }
     } catch (error) {
       console.error("Error saving resume:", error.message);
-      alert("Error saving resume.");
+      alert("Error saving resume. Make sure you updated the Supabase table!");
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleAuthSuccess = async (loggedInUser) => {
-    setIsAuthModalOpen(false);
-    await handleSave(loggedInUser);
   };
 
   const handleDownloadClick = () => {
@@ -133,11 +125,9 @@ export default function Builder({ user }) {
       <header className="app-header">
         <div className="header-content" style={{gap: '1rem'}}>
           <div style={{display: 'flex', alignItems: 'center', gap: '1rem', flex: 1}}>
-            {user && (
-              <Link to="/" style={{color: 'var(--text-light)', display: 'flex', alignItems: 'center'}}>
-                <ChevronLeft size={20} /> Back
-              </Link>
-            )}
+            <Link to="/" style={{color: 'var(--text-light)', display: 'flex', alignItems: 'center', textDecoration: 'none'}}>
+              <ChevronLeft size={20} /> Dashboard
+            </Link>
             <input 
               type="text" 
               value={title} 
@@ -163,7 +153,7 @@ export default function Builder({ user }) {
               Share Link
             </button>
             
-            <button className="download-btn" style={{backgroundColor: '#28a745'}} onClick={() => handleSave(user)} disabled={isSaving}>
+            <button className="download-btn" style={{backgroundColor: '#28a745'}} onClick={handleSave} disabled={isSaving}>
               <Save size={18} />
               {isSaving ? 'Saving...' : 'Save to Cloud'}
             </button>
@@ -189,12 +179,6 @@ export default function Builder({ user }) {
           </div>
         </section>
       </main>
-
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        onAuthSuccess={handleAuthSuccess} 
-      />
     </div>
   )
 }
